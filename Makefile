@@ -35,7 +35,8 @@ web:
 
 DEVICES=\
 	device_ff802.o\
-	device_ffucxii.o
+	device_ffucxii.o\
+	device_ffufxiii.o
 
 OSCMIX_OBJ=\
 	main.o\

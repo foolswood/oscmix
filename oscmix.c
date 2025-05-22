@@ -1635,8 +1635,10 @@ int
 init(const char *port)
 {
 	extern const struct device ffucxii;
+	extern const struct device ffufxiii;
 	static const struct device *devices[] = {
 		&ffucxii,
+        &ffufxiii
 	};
 	int i;
 	size_t namelen;

@@ -212,6 +212,8 @@ regtoctl(int reg, struct param *p)
             // case 0x307D: HARDWARE_STANDALONEMIDI; // ? next to this, and there's another one below?
             case 0x3200: return HARDWARE_DSPVERLOAD;
             case 0x3201: return HARDWARE_DSPAVAIL;
+            case 0x3202: return HARDWARE_DSPSTATUS;
+            case 0x3203: return HARDWARE_ARCDELTA;
         }
         if (reg >= 0x30A0) {
             p->out = (reg - 0x30A0) / 0x20;
@@ -437,6 +439,8 @@ static int ctltoreg(enum control ctl, const struct param *p)
 
         case HARDWARE_DSPVERLOAD:return 0x3200;
         case HARDWARE_DSPAVAIL:  return 0x3201;
+        case HARDWARE_DSPSTATUS: return 0x3202;
+        case HARDWARE_ARCDELTA:  return 0x3203;
     }
 	return -1;
 }

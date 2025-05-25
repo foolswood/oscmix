@@ -106,6 +106,8 @@ static enum control eq_dyn_reg_to_ctl(int const reg) {
     }
 }
 
+#define ROOM_EQ_BASE 0x3427
+
 #define MIX_REGION_SIZE (LEN(inputs) * 2 * 64)  // Inputs, playbacks 64 output slots
 
 static enum control
@@ -215,8 +217,8 @@ regtoctl(int reg, struct param *p)
             case 0x3202: return HARDWARE_DSPSTATUS;
             case 0x3203: return HARDWARE_ARCDELTA;
         }
-        if (reg >= 0x30A0) {
-            p->out = (reg - 0x30A0) / 0x20;
+        if (reg >= ROOM_EQ_BASE) {
+            p->out = (reg - ROOM_EQ_BASE) / 0x20;
             if (p->out > LEN(outputs))
                 return -1;
             switch (reg - (p->out * 0x20)) {
@@ -311,7 +313,7 @@ static int eqctltoreg(const struct param * const p, int const reg) {
 static int roomeqreg(int const idx, int const reg) {
   if (idx < 0 || idx >= LEN(outputs))
       return -1;
-  return idx * N_ROOMEQ_REGS + reg;
+  return ROOM_EQ_BASE + idx * N_ROOMEQ_REGS + reg;
 }
 
 static int ctltoreg(enum control ctl, const struct param *p)

@@ -106,6 +106,8 @@ static enum control eq_dyn_reg_to_ctl(int const reg) {
     }
 }
 
+#define DYN_METER_BASE 0x3264
+#define AUTO_LEVEL_BASE 0x3328
 #define ROOM_EQ_BASE 0x3427
 
 #define MIX_REGION_SIZE (LEN(inputs) * 2 * 64)  // Inputs, playbacks 64 output slots
@@ -126,7 +128,7 @@ regtoctl(int reg, struct param *p)
             case 0x01: return INPUT_FXSEND;
             case 0x02: return INPUT_STEREO;
             case 0x03: return INPUT_RECORD;
-            case 0x04: return UNKNOWN;
+            case 0x04: return UNKNOWN;  // We get these for all channels, value 0xA
             case 0x05: return INPUT_PLAYCHAN;
             // case 0x06: return INPUT_WIDTH;  // TODO: This doesn't exist on UCXII
             case 0x07: return INPUT_MSPROC;
@@ -170,7 +172,7 @@ regtoctl(int reg, struct param *p)
             */
             default: return UNKNOWN;
         }
-    } else if (reg < 0x4000) {
+    } else if (reg < DYN_METER_BASE) {
         switch (reg) {
             case 0x3000: return REVERB;
             case 0x3001: return REVERB_TYPE;
@@ -256,6 +258,22 @@ regtoctl(int reg, struct param *p)
                 case 0x1F: return ROOMEQ_BAND9Q;
             }
         }
+    } else if (reg > DYN_METER_BASE && reg < DYN_METER_BASE + LEN(inputs)) {
+        idx = (reg - DYN_METER_BASE) * 2; // Each register covers 2 channels
+        if (idx < LEN(inputs)) {
+            p->in = idx;
+        } else {
+            p->out = idx - LEN(inputs);
+        }
+        return DYNAMICS_METER;
+    } else if (reg > AUTO_LEVEL_BASE && reg < AUTO_LEVEL_BASE + LEN(inputs) + LEN(outputs)) {
+        idx = reg - AUTO_LEVEL_BASE;
+        if (idx < LEN(inputs)) {
+            p->in = idx;
+        } else {
+            p->out = idx - LEN(inputs);
+        }
+        return AUTOLEVEL_METER;
     } else if (reg > 0x4000 && reg < 0x4000 + MIX_REGION_SIZE) {
         p->out = reg >> 6 & 0x3F;
         p->in = reg & 0x3F;
@@ -264,9 +282,6 @@ regtoctl(int reg, struct param *p)
         return MIX;
     }
     // Not in the wiki so don't know the values:
-    //  - AUTOLEVEL_METER
-    //  - DYNAMICS_METER
-    //  - REFRESH
     //  - DUREC_*
 	return -1;
 }

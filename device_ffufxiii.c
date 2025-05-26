@@ -132,9 +132,9 @@ regtoctl(int reg, struct param *p)
             case 0x07: return INPUT_MSPROC;
             case 0x08: return INPUT_PHASE;
             case 0x09: return INPUT_GAIN;
-            case 0x0A: inputs[idx].flags & INPUT_HAS_48V ? INPUT_48V : INPUT_REFLEVEL;
-            case 0x0B: INPUT_AUTOSET;
-            case 0x0C: INPUT_HIZ;
+            case 0x0A: (inputs[idx].flags & INPUT_HAS_48V) ? INPUT_48V : INPUT_REFLEVEL;
+            case 0x0B: INPUT_HIZ;
+            case 0x0C: INPUT_AUTOSET;
             default: return eq_dyn_reg_to_ctl(reg - 0x0D);
         }
     } else if (reg < (LEN(inputs) + LEN(outputs)) * N_CHAN_REGS) {
@@ -331,8 +331,8 @@ static int ctltoreg(enum control ctl, const struct param *p)
         case INPUT_GAIN:        return inputctltoreg(p->in, 0x09);
         case INPUT_REFLEVEL:    return inputctltoregflag(p->in, 0x0A, INPUT_HAS_REFLEVEL);
         case INPUT_48V:         return inputctltoregflag(p->in, 0x0A, INPUT_HAS_48V);
-        case INPUT_AUTOSET:     return inputctltoregflag(p->in, 0x0B, INPUT_HAS_AUTOSET);
-        case INPUT_HIZ:         return inputctltoregflag(p->in, 0x0C, INPUT_HAS_HIZ);
+        case INPUT_HIZ:         return inputctltoregflag(p->in, 0x0B, INPUT_HAS_HIZ);
+        case INPUT_AUTOSET:     return inputctltoregflag(p->in, 0x0C, INPUT_HAS_AUTOSET);
         
         case OUTPUT_VOLUME:     return outputctltoreg(p->out, 0x00);
         case OUTPUT_PAN:        return outputctltoreg(p->out, 0x01);
@@ -456,7 +456,7 @@ const struct device ffufxiii = {
 	.inputslen = LEN(inputs),
 	.outputs = outputs,
 	.outputslen = LEN(outputs),
-	.refresh = 0x67CD,
+	.refresh = 0x234A,
 	.regtoctl = regtoctl,
 	.ctltoreg = ctltoreg,
 };
